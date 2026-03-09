@@ -1,0 +1,5 @@
+READ | Thread 1 | Replica 1 | Readers: [1, 1, 0] | Writer active: 0 | Contents: [test content 1] [test content 2] [test content 3]
+ |READ | Thread 2 | Replica 2 | Readers: [0, 1, 0] | Writer active: 0 | Contents: [test content 1] [test content 2] [test content 3]
+ |READ | Thread 3 | Replica 1 | Readers: [1, 0, 0] | Writer active: 0 | Contents: [test content 1] [test content 2] [test content 3]
+ |WRITE | Thread 0 | Replica 0 | Readers: [0, 0, 0] | Writer active: 1 | Contents: [Updated version 1] [Updated version 1] [Updated version 1]
+ |
