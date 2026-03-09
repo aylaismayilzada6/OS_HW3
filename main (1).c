@@ -136,48 +136,44 @@ Writer should:
  
 */
 void* writer(void* arg) {
-    
     int version = 1;
-    sleep(rand() % 3 + 1);
-    
-    sem_wait(&mutex);
-    writerWaiting = 1;
-    sem_post(&mutex);
 
-    sem_wait(&writeLock); // waits untill all reders finish 
-    sem_wait(&mutex);
-    writerActive = 1;
-    sem_post(&mutex);
-    
-    char newContent[100];
-    sprintf(newContent, "Updated version %d", version++);
+    for (int k = 0; k < 3; k++) {
+        sleep(rand() % 3 + 1);
 
-    /*
-    updates all replicas 
-    */
-    for (int i = 0; i < NUM_REPLICAS; i++) {
-        strcpy(replicas[i], newContent);
+        sem_wait(&mutex);
+        writerWaiting = 1;
+        sem_post(&mutex);
+
+        sem_wait(&writeLock);
+
+        sem_wait(&mutex);
+        writerActive = 1;
+        sem_post(&mutex);
+
+        char newContent[100];
+        sprintf(newContent, "Updated version %d", version++);
+
+        for (int i = 0; i < NUM_REPLICAS; i++) {
+            strcpy(replicas[i], newContent);
+        }
+
+        printf("writer START writing to all replicas\n");
+        sleep(2);
+        printf("writer FINISH writing to all replicas\n");
+
+        logStatus("WRITE", 0, 0);
+
+        sem_wait(&mutex);
+        writerActive = 0;
+        writerWaiting = 0;
+        sem_post(&mutex);
+
+        sem_post(&writeLock);
     }
-
-    
-    printf("writer START writing to all replicas\n");
-    sleep(2);
-    printf("writer FINISH writing to all replicas\n");
-    
-    logStatus("WRITE", 0, 0);
-    
-    sem_wait(&mutex);
-    writerActive = 0;
-    writerWaiting = 0;
-    sem_post(&mutex);
-
-    sem_post(&writeLock);
 
     return NULL;
 }
-
-
-
 /* 
     append one entry after each read or write,
     each log should inlude:
